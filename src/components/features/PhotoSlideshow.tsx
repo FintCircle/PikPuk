@@ -337,15 +337,6 @@ export function PhotoSlideshow() {
           </div>
         </div>
 
-        {/* Desktop arrows */}
-        {isDesktop && !storyOpen && (
-          <>
-            <button onClick={goPrev} className="absolute left-5 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center rounded-full opacity-0 hover:opacity-100 transition-opacity duration-200"
-              style={{ background: "rgba(20,12,4,0.5)", color: "#c4a882", border: "1px solid rgba(196,168,130,0.2)" }} aria-label="Previous">←</button>
-            <button onClick={goNext} className="absolute right-5 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center rounded-full opacity-0 hover:opacity-100 transition-opacity duration-200"
-              style={{ background: "rgba(20,12,4,0.5)", color: "#c4a882", border: "1px solid rgba(196,168,130,0.2)" }} aria-label="Next">→</button>
-          </>
-        )}
       </div>
 
       {storyOpen && <StoryPanel photo={currentPhoto} onClose={() => setStoryOpen(false)} isDesktop={isDesktop} />}
