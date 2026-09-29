@@ -61,14 +61,19 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'Crimson Text', Georgia, serif;
-    overscroll-behavior: none;
+    overscroll-behavior-x: none;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
   html, body, #root {
-    height: 100%;
-    overflow: hidden;
-    position: fixed;
+    min-height: 100%;
     width: 100%;
+  }
+
+  #root {
+    overflow-x: hidden;
+    overflow-y: visible;
   }
 }
 

@@ -69,8 +69,8 @@ export default function Users() {
             <p className="font-crimson text-sm" style={{ color: "#6a5438" }}>No users yet.</p>
           </div>
         ) : (
-          <div className="rounded-sm overflow-hidden" style={{ border: "1px solid rgba(196,168,130,0.12)" }}>
-            <table className="w-full">
+          <div className="overflow-x-auto rounded-sm" style={{ border: "1px solid rgba(196,168,130,0.12)" }}>
+            <table className="w-full min-w-[640px]">
               <thead>
                 <tr style={{ borderBottom: "1px solid rgba(196,168,130,0.1)", background: "rgba(196,168,130,0.04)" }}>
                   {["USER", "ROLE", "STATUS", "ACTIONS"].map(h => (
