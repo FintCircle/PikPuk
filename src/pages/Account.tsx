@@ -67,8 +67,8 @@ export default function Account() {
 
       <div className="relative z-10 max-w-4xl mx-auto px-4 py-6">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3 min-w-0">
             <Link to="/" className="flex items-center justify-center w-8 h-8 rounded-full"
               style={{ background: "rgba(196,168,130,0.08)", border: "1px solid rgba(196,168,130,0.15)", color: "#9a7c5a" }}>
               <ArrowLeft size={14} />
@@ -80,7 +80,7 @@ export default function Account() {
               <p className="text-xs font-crimson mt-0.5" style={{ color: "#6a5438" }}>{user?.email}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {user?.isAdmin && (
               <Link to="/admin" className="px-3 py-1.5 text-xs font-crimson rounded-sm"
                 style={{ color: "#c4a882", border: "1px solid rgba(196,168,130,0.25)", background: "rgba(196,168,130,0.08)" }}>
