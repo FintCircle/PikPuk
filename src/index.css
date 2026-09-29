@@ -63,6 +63,7 @@
     font-family: 'Crimson Text', Georgia, serif;
     overscroll-behavior-x: none;
     overflow-x: hidden;
+    overflow-y: auto;
   }
 
   html, body, #root {
@@ -72,6 +73,7 @@
 
   #root {
     overflow-x: hidden;
+    overflow-y: visible;
   }
 }
 
