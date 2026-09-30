@@ -8,6 +8,7 @@ import { StoryPanel } from "@/components/features/StoryPanel";
 import { MusicPlayer } from "@/components/features/MusicPlayer";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
+import { getImageUrl } from "@/lib/image-url";
 
 // ─── Controlled Shuffle ───────────────────────────────────────────────────────
 // Priority: unseen > new (recently published) > anything
@@ -91,7 +92,7 @@ function weightedShuffle(photos: Photo[], viewedIds: Set<string>): Photo[] {
 function dbToPhoto(p: DbPhoto): Photo {
   return {
     id: p.id,
-    imageUrl: p.image_url,
+    imageUrl: getImageUrl(p.image_url),
     caption: p.caption,
     location: p.location,
     year: p.year,

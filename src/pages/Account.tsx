@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
+import { getImageUrl } from "@/lib/image-url";
 import { useAuth } from "@/contexts/AuthContext";
 import { DbPhoto } from "@/types/db";
 import { toast } from "sonner";
@@ -155,7 +156,7 @@ export default function Account() {
                       style={{ background: "rgba(196,168,130,0.04)", border: "1px solid rgba(196,168,130,0.1)" }}>
                       <div className="w-16 h-12 rounded-sm overflow-hidden flex-shrink-0"
                         style={{ border: "1px solid rgba(196,168,130,0.15)" }}>
-                        <img src={photo.image_url} alt={photo.caption} className="w-full h-full object-cover"
+                        <img src={getImageUrl(photo.image_url)} alt={photo.caption} className="w-full h-full object-cover"
                           style={{ filter: "sepia(20%)" }} />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -204,7 +205,7 @@ export default function Account() {
                   <div key={photo.id} className="rounded-sm overflow-hidden"
                     style={{ border: "1px solid rgba(196,168,130,0.1)" }}>
                     <div className="aspect-square overflow-hidden">
-                      <img src={photo.image_url} alt={photo.caption} className="w-full h-full object-cover"
+                      <img src={getImageUrl(photo.image_url)} alt={photo.caption} className="w-full h-full object-cover"
                         style={{ filter: "sepia(25%)" }} />
                     </div>
                     <div className="px-2 py-1.5">

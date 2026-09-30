@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
+import { getImageUrl } from "@/lib/image-url";
 import { useAuth } from "@/contexts/AuthContext";
 import { DbPhoto } from "@/types/db";
 import { toast } from "sonner";
@@ -264,7 +265,7 @@ export default function AdminDashboard() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-9 rounded-sm overflow-hidden flex-shrink-0" style={{ border: "1px solid rgba(196,168,130,0.15)" }}>
-                          <img src={photo.image_url} alt={photo.caption} className="w-full h-full object-cover" style={{ filter: "sepia(20%) contrast(1.02)" }} />
+                          <img src={getImageUrl(photo.image_url)} alt={photo.caption} className="w-full h-full object-cover" style={{ filter: "sepia(20%) contrast(1.02)" }} />
                         </div>
                         <div>
                           <p className="font-playfair text-sm font-semibold leading-snug" style={{ color: "#c0a880" }}>{photo.caption}</p>
