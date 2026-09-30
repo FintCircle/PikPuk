@@ -24,6 +24,7 @@ export function StoryPanel({ photo, onClose, isDesktop }: StoryPanelProps) {
   const [panStart, setPanStart] = useState({ x: 0, y: 0, imgX: 0, imgY: 0 });
   const lastTapRef = useRef<number>(0);
   const lastPinchDistRef = useRef<number>(0);
+  const mousePanRef = useRef<{ x: number; y: number; imgX: number; imgY: number } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const imgAreaRef = useRef<HTMLDivElement>(null);
   const dragStartY = useRef<number>(0);
@@ -102,6 +103,35 @@ export function StoryPanel({ photo, onClose, isDesktop }: StoryPanelProps) {
 
   const handleImgTouchEnd = useCallback(() => {
     setIsPanning(false);
+    lastPinchDistRef.current = 0;
+  }, []);
+
+  const handleImgWheel = useCallback((e: React.WheelEvent) => {
+    e.preventDefault();
+    const rect = imgAreaRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const factor = Math.exp(-e.deltaY * 0.002);
+    setZoom(prev => clampZoom(prev.scale * factor, prev.x, prev.y, rect.width, rect.height));
+  }, [clampZoom]);
+
+  const handleImgMouseDown = useCallback((e: React.MouseEvent) => {
+    if (e.button !== 0 || zoom.scale <= 1) return;
+    e.preventDefault();
+    mousePanRef.current = { x: e.clientX, y: e.clientY, imgX: zoom.x, imgY: zoom.y };
+    setIsPanning(true);
+  }, [zoom]);
+
+  const handleImgMouseMove = useCallback((e: React.MouseEvent) => {
+    const start = mousePanRef.current;
+    if (!start) return;
+    const rect = imgAreaRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    setZoom(prev => clampZoom(prev.scale, start.imgX + e.clientX - start.x, start.imgY + e.clientY - start.y, rect.width, rect.height));
+  }, [clampZoom]);
+
+  const handleImgMouseUp = useCallback(() => {
+    mousePanRef.current = null;
+    setIsPanning(false);
   }, []);
 
   // Drag divider (mobile)
@@ -163,6 +193,11 @@ export function StoryPanel({ photo, onClose, isDesktop }: StoryPanelProps) {
           onTouchStart={handleImgTouchStart}
           onTouchMove={handleImgTouchMove}
           onTouchEnd={handleImgTouchEnd}
+          onWheel={handleImgWheel}
+          onMouseDown={handleImgMouseDown}
+          onMouseMove={handleImgMouseMove}
+          onMouseUp={handleImgMouseUp}
+          onMouseLeave={handleImgMouseUp}
         >
           {isPhotoFullscreen && (
             <div className="absolute inset-0 z-50 bg-black flex items-center justify-center">
@@ -265,6 +300,11 @@ export function StoryPanel({ photo, onClose, isDesktop }: StoryPanelProps) {
             onTouchStart={handleImgTouchStart}
             onTouchMove={handleImgTouchMove}
             onTouchEnd={handleImgTouchEnd}
+            onWheel={handleImgWheel}
+            onMouseDown={handleImgMouseDown}
+            onMouseMove={handleImgMouseMove}
+            onMouseUp={handleImgMouseUp}
+            onMouseLeave={handleImgMouseUp}
           >
             <img
               src={photo.imageUrl}
@@ -296,6 +336,11 @@ export function StoryPanel({ photo, onClose, isDesktop }: StoryPanelProps) {
         onTouchStart={handleImgTouchStart}
         onTouchMove={handleImgTouchMove}
         onTouchEnd={handleImgTouchEnd}
+        onWheel={handleImgWheel}
+        onMouseDown={handleImgMouseDown}
+        onMouseMove={handleImgMouseMove}
+        onMouseUp={handleImgMouseUp}
+        onMouseLeave={handleImgMouseUp}
       >
         <img
           src={photo.imageUrl}
