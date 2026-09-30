@@ -3,7 +3,6 @@ import { Info, Camera, UserCircle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { DbPhoto } from "@/types/db";
 import { Photo } from "@/types/photo";
-import { PHOTOS as FALLBACK_PHOTOS } from "@/constants/photos";
 import { StoryPanel } from "@/components/features/StoryPanel";
 import { MusicPlayer } from "@/components/features/MusicPlayer";
 import { useAuth } from "@/contexts/AuthContext";
@@ -92,7 +91,7 @@ function weightedShuffle(photos: Photo[], viewedIds: Set<string>): Photo[] {
 function dbToPhoto(p: DbPhoto): Photo {
   return {
     id: p.id,
-    imageUrl: getImageUrl(p.image_url),
+    imageUrl: getImageUrl(p.r2_key || p.image_url),
     caption: p.caption,
     location: p.location,
     year: p.year,
@@ -127,7 +126,10 @@ export function PhotoSlideshow() {
       .eq("status", "approved")
       .order("created_at", { ascending: false })
       .then(({ data, error }) => {
-        if (!error && data && data.length > 0) setDbPhotos(data.map(dbToPhoto));
+        if (!error && data) {
+          const r2Photos = data.filter((photo) => Boolean(photo.r2_key)).map(dbToPhoto);
+          setDbPhotos(r2Photos);
+        }
         setDbLoading(false);
       });
   }, []);
@@ -146,8 +148,7 @@ export function PhotoSlideshow() {
     return getLocalViewed();
   }, [user, dbViewedIds]);
 
-  const sourcePhotos = !dbLoading && dbPhotos.length > 0 ? dbPhotos : FALLBACK_PHOTOS;
-  const shuffled = useMemo(() => weightedShuffle(sourcePhotos, viewedIds), [sourcePhotos, viewedIds]);
+  const shuffled = useMemo(() => weightedShuffle(dbPhotos, viewedIds), [dbPhotos, viewedIds]);
 
   const [index, setIndex] = useState(0);
   const [storyOpen, setStoryOpen] = useState(false);
@@ -264,7 +265,7 @@ export function PhotoSlideshow() {
         {/* Photo */}
         <div className="absolute inset-0" style={{
           transform: getSlideTransform(),
-          transition: dragOffset !== 0 ? "none" : "transform 0.32s cubic-bezier(0.4, 0, 0.2, 1)",
+          transition: dragOffset !== 0 ? "none" : "transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)",
         }}>
           <img src={currentPhoto.imageUrl} alt={currentPhoto.caption} className="w-full h-full object-cover sepia-photo"
             draggable={false} style={{ userSelect: "none" }} />
