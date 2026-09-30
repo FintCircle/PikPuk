@@ -154,7 +154,12 @@ export function StoryPanel({ photo, onClose, isDesktop }: StoryPanelProps) {
         <div
           ref={imgAreaRef}
           className="relative overflow-hidden"
-          style={{ width: "65%", cursor: zoom.scale > 1 ? "grab" : "default" }}
+          style={{
+            width: "65%",
+            cursor: zoom.scale > 1 ? "grab" : "default",
+            touchAction: "none",
+            isolation: "isolate",
+          }}
           onTouchStart={handleImgTouchStart}
           onTouchMove={handleImgTouchMove}
           onTouchEnd={handleImgTouchEnd}
@@ -200,6 +205,7 @@ export function StoryPanel({ photo, onClose, isDesktop }: StoryPanelProps) {
           className="relative flex flex-col story-scroll"
           style={{
             width: "35%",
+            touchAction: "pan-y",
             background: "linear-gradient(160deg, hsl(36 28% 11%) 0%, hsl(28 32% 8%) 100%)",
             borderLeft: "1px solid rgba(196, 168, 130, 0.12)",
             overflowY: "auto",
@@ -339,6 +345,7 @@ export function StoryPanel({ photo, onClose, isDesktop }: StoryPanelProps) {
       <div
         className="flex-1 overflow-hidden flex flex-col"
         style={{
+          touchAction: "pan-y",
           background: "linear-gradient(160deg, hsl(36 28% 11%) 0%, hsl(28 32% 8%) 100%)",
           minHeight: 0,
         }}
@@ -372,7 +379,7 @@ export function StoryPanel({ photo, onClose, isDesktop }: StoryPanelProps) {
         </div>
 
         {/* Scrollable text */}
-        <div className="flex-1 overflow-y-auto story-scroll px-5 py-4">
+        <div className="flex-1 overflow-y-auto story-scroll px-5 py-4" style={{ touchAction: "pan-y" }}>
           <div className="font-crimson text-[16px] leading-relaxed space-y-4 pb-8" style={{ color: "#c0a880" }}>
             {photo.story.split("\n\n").map((para, i) => (
               <p key={i}>{para}</p>
