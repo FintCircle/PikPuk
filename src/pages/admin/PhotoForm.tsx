@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
-import { getImageUrl } from "@/lib/image-url";
+import { getImageUrl, getR2ObjectKey } from "@/lib/image-url";
 import { DbPhoto } from "@/types/db";
 import { toast } from "sonner";
 import {
@@ -139,8 +139,8 @@ export default function PhotoForm() {
       setUploading(true);
       try {
         const result = await uploadToR2(imageFile);
-        finalImageUrl = result.imageUrl;
-        finalR2Key = result.r2Key;
+        finalR2Key = getR2ObjectKey(result.r2Key);
+        finalImageUrl = finalR2Key;
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : "Upload failed";
         toast.error(message);
