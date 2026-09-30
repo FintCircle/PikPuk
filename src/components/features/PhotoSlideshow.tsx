@@ -159,6 +159,17 @@ export function PhotoSlideshow() {
   const touchStartY = useRef<number | null>(null);
   const isDragging = useRef(false);
   const [dragOffset, setDragOffset] = useState(0);
+  const [imageScale, setImageScale] = useState(1);
+  const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 });
+  const imageGesture = useRef({
+    startX: 0,
+    startY: 0,
+    originX: 0,
+    originY: 0,
+    startDistance: 0,
+    startScale: 1,
+    dragging: false,
+  });
 
   const currentPhoto = shuffled[index] ?? shuffled[0];
 
@@ -188,7 +199,8 @@ export function PhotoSlideshow() {
   // Record view when photo changes
   useEffect(() => {
     if (currentPhoto) recordView(currentPhoto);
-  }, [currentPhoto?.id]);
+    resetImageView();
+  }, [currentPhoto?.id, recordView, resetImageView]);
 
   const goTo = useCallback((newIndex: number, dir: "left" | "right") => {
     if (isTransitioning || storyOpen) return;
@@ -246,6 +258,69 @@ export function PhotoSlideshow() {
     mouseStartX.current = null;
   }, [storyOpen, goNext, goPrev]);
 
+  const resetImageView = useCallback(() => {
+    setImageScale(1);
+    setImagePosition({ x: 0, y: 0 });
+  }, []);
+
+  const updateImageScale = useCallback((nextScale: number, origin?: { x: number; y: number }) => {
+    const scale = Math.min(4, Math.max(1, nextScale));
+    setImageScale(scale);
+    if (scale === 1) setImagePosition({ x: 0, y: 0 });
+    else if (origin) {
+      setImagePosition((position) => ({
+        x: position.x + (origin.x - position.x) * (scale - imageScale) / scale,
+        y: position.y + (origin.y - position.y) * (scale - imageScale) / scale,
+      }));
+    }
+  }, [imageScale]);
+
+  const onImageWheel = useCallback((e: React.WheelEvent) => {
+    e.preventDefault();
+    updateImageScale(imageScale - e.deltaY * 0.002, { x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY });
+  }, [imageScale, updateImageScale]);
+
+  const onImagePointerDown = useCallback((e: React.PointerEvent) => {
+    if (imageScale <= 1) return;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    imageGesture.current = { ...imageGesture.current, startX: e.clientX, startY: e.clientY, originX: imagePosition.x, originY: imagePosition.y, dragging: true };
+  }, [imageScale, imagePosition]);
+
+  const onImagePointerMove = useCallback((e: React.PointerEvent) => {
+    if (!imageGesture.current.dragging || imageScale <= 1) return;
+    setImagePosition({ x: imageGesture.current.originX + e.clientX - imageGesture.current.startX, y: imageGesture.current.originY + e.clientY - imageGesture.current.startY });
+  }, [imageScale]);
+
+  const onImagePointerUp = useCallback(() => { imageGesture.current.dragging = false; }, []);
+
+  const onImageTouchStart = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      const [a, b] = Array.from(e.touches);
+      imageGesture.current.startDistance = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+      imageGesture.current.startScale = imageScale;
+      return;
+    }
+    if (imageScale > 1) {
+      const touch = e.touches[0];
+      imageGesture.current = { ...imageGesture.current, startX: touch.clientX, startY: touch.clientY, originX: imagePosition.x, originY: imagePosition.y, dragging: true };
+    }
+  }, [imageScale, imagePosition]);
+
+  const onImageTouchMove = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      const [a, b] = Array.from(e.touches);
+      const distance = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+      updateImageScale(imageGesture.current.startScale * distance / imageGesture.current.startDistance);
+    } else if (imageGesture.current.dragging && imageScale > 1) {
+      e.preventDefault();
+      const touch = e.touches[0];
+      setImagePosition({ x: imageGesture.current.originX + touch.clientX - imageGesture.current.startX, y: imageGesture.current.originY + touch.clientY - imageGesture.current.startY });
+    }
+  }, [imageScale, updateImageScale]);
+
+  const onImageTouchEnd = useCallback(() => { imageGesture.current.dragging = false; }, []);
+
   const getSlideTransform = () => {
     if (dragOffset !== 0) return `translateX(${dragOffset}px)`;
     if (isTransitioning) return direction === "left" ? "translateX(-100vw)" : "translateX(100vw)";
@@ -267,8 +342,23 @@ export function PhotoSlideshow() {
           transform: getSlideTransform(),
           transition: dragOffset !== 0 ? "none" : "transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)",
         }}>
-          <img src={currentPhoto.imageUrl} alt={currentPhoto.caption} className="w-full h-full object-cover sepia-photo"
-            draggable={false} style={{ userSelect: "none" }} />
+          <div
+            className="absolute inset-0 touch-none"
+            onWheel={onImageWheel}
+            onPointerDown={onImagePointerDown}
+            onPointerMove={onImagePointerMove}
+            onPointerUp={onImagePointerUp}
+            onPointerCancel={onImagePointerUp}
+            onTouchStart={onImageTouchStart}
+            onTouchMove={onImageTouchMove}
+            onTouchEnd={onImageTouchEnd}
+            onDoubleClick={() => imageScale > 1 ? resetImageView() : updateImageScale(2)}
+            style={{ cursor: imageScale > 1 ? "grab" : "zoom-in" }}
+          >
+            <img src={currentPhoto.imageUrl} alt={currentPhoto.caption} className="w-full h-full object-cover sepia-photo"
+              draggable={false}
+              style={{ userSelect: "none", transform: `translate(${imagePosition.x}px, ${imagePosition.y}px) scale(${imageScale})`, transformOrigin: "center", transition: imageGesture.current.dragging ? "none" : "transform 120ms ease-out" }} />
+          </div>
           <div className="absolute inset-0 pointer-events-none" style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.085'/%3E%3C/svg%3E")`,
             mixBlendMode: "multiply",
