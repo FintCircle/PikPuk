@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
+import { getImageUrl } from "@/lib/image-url";
 import { DbPhoto } from "@/types/db";
 import { toast } from "sonner";
 import { ArrowLeft, CheckCircle, XCircle, Eye, Loader2, ExternalLink, User } from "lucide-react";
@@ -127,7 +128,7 @@ export default function Submissions() {
                   {/* Thumbnail */}
                   <div className="w-28 h-20 rounded-sm overflow-hidden flex-shrink-0"
                     style={{ border: "1px solid rgba(196,168,130,0.15)" }}>
-                    <img src={photo.image_url} alt={photo.caption} className="w-full h-full object-cover"
+                    <img src={getImageUrl(photo.image_url)} alt={photo.caption} className="w-full h-full object-cover"
                       style={{ filter: "sepia(20%)" }} />
                   </div>
 

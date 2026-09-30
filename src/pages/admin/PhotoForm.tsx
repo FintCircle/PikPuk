@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
+import { getImageUrl } from "@/lib/image-url";
 import { DbPhoto } from "@/types/db";
 import { toast } from "sonner";
 import {
@@ -66,7 +67,7 @@ export default function PhotoForm() {
         sort_order: p.sort_order,
         is_published: p.is_published,
       });
-      setImagePreview(p.image_url);
+      setImagePreview(getImageUrl(p.image_url));
       setExistingR2Key(p.r2_key);
       setImageSource(p.r2_key ? "upload" : "url");
       setFetchLoading(false);
@@ -339,7 +340,7 @@ export default function PhotoForm() {
                   {imagePreview && !imageFile && isEdit ? (
                     <div className="relative">
                       <img
-                        src={imagePreview}
+                        src={getImageUrl(imagePreview)}
                         alt="Current"
                         className="w-full rounded-sm object-cover"
                         style={{ maxHeight: "280px", filter: "sepia(15%)" }}
@@ -358,7 +359,7 @@ export default function PhotoForm() {
                   ) : imageFile && imagePreview ? (
                     <div className="relative">
                       <img
-                        src={imagePreview}
+                        src={getImageUrl(imagePreview)}
                         alt="Preview"
                         className="w-full rounded-sm object-cover"
                         style={{ maxHeight: "280px", filter: "sepia(15%)" }}
@@ -416,7 +417,7 @@ export default function PhotoForm() {
                 />
                 {imagePreview && (
                   <img
-                    src={imagePreview}
+                    src={getImageUrl(imagePreview)}
                     alt="Preview"
                     className="mt-3 w-full rounded-sm object-cover"
                     style={{ maxHeight: "220px", filter: "sepia(15%)", border: "1px solid rgba(196,168,130,0.15)" }}
