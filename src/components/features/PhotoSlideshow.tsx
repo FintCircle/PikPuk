@@ -196,6 +196,11 @@ export function PhotoSlideshow() {
     }
   }, [user]);
 
+  const resetImageView = useCallback(() => {
+    setImageScale(1);
+    setImagePosition({ x: 0, y: 0 });
+  }, []);
+
   // Record view when photo changes
   useEffect(() => {
     if (currentPhoto) recordView(currentPhoto);
@@ -257,11 +262,6 @@ export function PhotoSlideshow() {
     if (Math.abs(dx) > 80) { if (dx < 0) goNext(); else goPrev(); }
     mouseStartX.current = null;
   }, [storyOpen, goNext, goPrev]);
-
-  const resetImageView = useCallback(() => {
-    setImageScale(1);
-    setImagePosition({ x: 0, y: 0 });
-  }, []);
 
   const updateImageScale = useCallback((nextScale: number, origin?: { x: number; y: number }) => {
     const scale = Math.min(4, Math.max(1, nextScale));
