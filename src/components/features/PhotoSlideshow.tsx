@@ -196,10 +196,10 @@ export function PhotoSlideshow() {
     }
   }, [user]);
 
-  const resetImageView = useCallback(() => {
+  function resetImageView() {
     setImageScale(1);
     setImagePosition({ x: 0, y: 0 });
-  }, []);
+  }
 
   // Record view when photo changes
   useEffect(() => {
