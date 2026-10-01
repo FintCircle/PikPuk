@@ -441,16 +441,6 @@ export function PhotoSlideshow() {
               {currentPhoto.caption}
             </h1>
           </div>
-          <div className="flex items-center gap-1.5 mt-4">
-            {shuffled.slice(0, 12).map((_, i) => (
-              <div key={i} className="rounded-full transition-all duration-300" style={{
-                width: i === index ? "20px" : "5px",
-                height: "5px",
-                background: i === index ? "rgba(212,184,150,0.9)" : "rgba(212,184,150,0.3)",
-              }} />
-            ))}
-            {shuffled.length > 12 && <span className="font-crimson text-xs" style={{ color: "rgba(196,168,130,0.4)" }}>+{shuffled.length - 12}</span>}
-          </div>
         </div>
 
       </div>
