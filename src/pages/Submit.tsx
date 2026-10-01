@@ -6,6 +6,59 @@ import { toast } from "sonner";
 import { Upload, X, Loader2, ArrowLeft, ImageIcon, Camera } from "lucide-react";
 import { FunctionsHttpError } from "@supabase/supabase-js";
 
+type FormValues = {
+  title: string;
+  caption: string;
+  story: string;
+  year: string;
+  location: string;
+  photographer: string;
+  source_info: string;
+  relationship_to_photo: string;
+  source_link: string;
+  credit_name: string;
+  contact_email: string;
+};
+
+type FieldProps = {
+  label: string;
+  name: keyof FormValues;
+  value: string;
+  onChange: (name: keyof FormValues, value: string) => void;
+  onFocus: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  onBlur: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  req?: boolean;
+  placeholder?: string;
+  type?: string;
+};
+
+const inputCls = "w-full px-3 py-2.5 text-sm font-crimson rounded-sm outline-none transition-colors";
+const inputStyle = { background: "rgba(196,168,130,0.06)", border: "1px solid rgba(196,168,130,0.2)", color: "#e8d8c0" };
+
+function Field({ label, name, value, onChange, onFocus, onBlur, req, placeholder, type }: FieldProps) {
+  return (
+    <div>
+      <label className="block text-xs font-crimson mb-1.5" style={{ color: "#9a7c5a", letterSpacing: "0.07em" }}>
+        {label.toUpperCase()}{req && <span style={{ color: "#c05040" }}> *</span>}
+      </label>
+      <input type={type ?? "text"} value={value} onChange={e => onChange(name, e.target.value)} placeholder={placeholder} required={req}
+        className={inputCls} style={inputStyle} onFocus={onFocus} onBlur={onBlur} />
+    </div>
+  );
+}
+
+function TextArea({ label, name, value, onChange, onFocus, onBlur, req, placeholder, rows }: FieldProps & { rows?: number }) {
+  return (
+    <div>
+      <label className="block text-xs font-crimson mb-1.5" style={{ color: "#9a7c5a", letterSpacing: "0.07em" }}>
+        {label.toUpperCase()}{req && <span style={{ color: "#c05040" }}> *</span>}
+      </label>
+      <textarea value={value} onChange={e => onChange(name, e.target.value)} placeholder={placeholder} rows={rows ?? 4} required={req}
+        className={inputCls + " resize-y"} style={{ ...inputStyle, minHeight: "90px" }} onFocus={onFocus} onBlur={onBlur} />
+    </div>
+  );
+}
+
 export default function Submit() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -140,30 +193,8 @@ export default function Submit() {
     );
   }
 
-  const inputCls = "w-full px-3 py-2.5 text-sm font-crimson rounded-sm outline-none transition-colors";
-  const inputStyle = { background: "rgba(196,168,130,0.06)", border: "1px solid rgba(196,168,130,0.2)", color: "#e8d8c0" };
   const onFocus = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => e.currentTarget.style.borderColor = "rgba(196,168,130,0.45)";
   const onBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => e.currentTarget.style.borderColor = "rgba(196,168,130,0.2)";
-
-  const Field = ({ label, name, req, placeholder, type }: { label: string; name: keyof typeof form; req?: boolean; placeholder?: string; type?: string }) => (
-    <div>
-      <label className="block text-xs font-crimson mb-1.5" style={{ color: "#9a7c5a", letterSpacing: "0.07em" }}>
-        {label.toUpperCase()}{req && <span style={{ color: "#c05040" }}> *</span>}
-      </label>
-      <input type={type ?? "text"} value={form[name]} onChange={e => set(name, e.target.value)} placeholder={placeholder} required={req}
-        className={inputCls} style={inputStyle} onFocus={onFocus} onBlur={onBlur} />
-    </div>
-  );
-
-  const TextArea = ({ label, name, req, placeholder, rows }: { label: string; name: keyof typeof form; req?: boolean; placeholder?: string; rows?: number }) => (
-    <div>
-      <label className="block text-xs font-crimson mb-1.5" style={{ color: "#9a7c5a", letterSpacing: "0.07em" }}>
-        {label.toUpperCase()}{req && <span style={{ color: "#c05040" }}> *</span>}
-      </label>
-      <textarea value={form[name]} onChange={e => set(name, e.target.value)} placeholder={placeholder} rows={rows ?? 4} required={req}
-        className={inputCls + " resize-y"} style={{ ...inputStyle, minHeight: "90px" }} onFocus={onFocus} onBlur={onBlur} />
-    </div>
-  );
 
   const sectionStyle = { background: "rgba(196,168,130,0.04)", border: "1px solid rgba(196,168,130,0.12)" };
 
@@ -225,32 +256,32 @@ export default function Submit() {
           {/* Core details */}
           <div className="rounded-sm p-5 space-y-4" style={sectionStyle}>
             <p className="text-xs font-crimson" style={{ color: "#9a7c5a", letterSpacing: "0.07em" }}>PHOTOGRAPH DETAILS</p>
-            <Field label="Short Caption" name="caption" req placeholder="e.g. Fifth Avenue, New York City" />
-            <Field label="Title (optional)" name="title" placeholder="A longer descriptive title" />
+            <Field label="Short Caption" name="caption" value={form.caption} onChange={set} onFocus={onFocus} onBlur={onBlur} req placeholder="e.g. Fifth Avenue, New York City" />
+            <Field label="Title (optional)" name="title" value={form.title} onChange={set} onFocus={onFocus} onBlur={onBlur} placeholder="A longer descriptive title" />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Field label="Approximate Date" name="year" placeholder="c. 1908, 1920s, Unknown" />
-              <Field label="Location" name="location" req placeholder="City, Country" />
+              <Field label="Approximate Date" name="year" value={form.year} onChange={set} onFocus={onFocus} onBlur={onBlur} placeholder="c. 1908, 1920s, Unknown" />
+              <Field label="Location" name="location" value={form.location} onChange={set} onFocus={onFocus} onBlur={onBlur} req placeholder="City, Country" />
             </div>
-            <Field label="Photographer or Creator" name="photographer" placeholder="Name or 'Unknown'" />
-            <TextArea label="Full Story or Additional Information" name="story" rows={5}
+            <Field label="Photographer or Creator" name="photographer" value={form.photographer} onChange={set} onFocus={onFocus} onBlur={onBlur} placeholder="Name or 'Unknown'" />
+            <TextArea label="Full Story or Additional Information" name="story" value={form.story} onChange={set} onFocus={onFocus} onBlur={onBlur} rows={5}
               placeholder="Share what you know about this photograph, its context, the people in it, or the moment it captures. Even a few sentences help." />
           </div>
 
           {/* Provenance */}
           <div className="rounded-sm p-5 space-y-4" style={sectionStyle}>
             <p className="text-xs font-crimson" style={{ color: "#9a7c5a", letterSpacing: "0.07em" }}>PROVENANCE & SOURCE</p>
-            <TextArea label="Where did you obtain this photograph?" name="source_info" rows={2}
+            <TextArea label="Where did you obtain this photograph?" name="source_info" value={form.source_info} onChange={set} onFocus={onFocus} onBlur={onBlur} rows={2}
               placeholder="Family album, estate sale, library archive, personal collection…" />
-            <TextArea label="Your relationship to this photograph" name="relationship_to_photo" rows={2}
+            <TextArea label="Your relationship to this photograph" name="relationship_to_photo" value={form.relationship_to_photo} onChange={set} onFocus={onFocus} onBlur={onBlur} rows={2}
               placeholder="Family heirloom, found in grandmother's attic, purchased from collector…" />
-            <Field label="Source link (if available)" name="source_link" type="url" placeholder="https://" />
+            <Field label="Source link (if available)" name="source_link" value={form.source_link} onChange={set} onFocus={onFocus} onBlur={onBlur} type="url" placeholder="https://" />
           </div>
 
           {/* Credit & contact */}
           <div className="rounded-sm p-5 space-y-4" style={sectionStyle}>
             <p className="text-xs font-crimson" style={{ color: "#9a7c5a", letterSpacing: "0.07em" }}>CREDIT & CONTACT</p>
-            <Field label="Preferred public credit name" name="credit_name" placeholder="e.g. From the Collection of J. Smith" />
-            <Field label="Contact email" name="contact_email" type="email" placeholder="you@example.com" />
+            <Field label="Preferred public credit name" name="credit_name" value={form.credit_name} onChange={set} onFocus={onFocus} onBlur={onBlur} placeholder="e.g. From the Collection of J. Smith" />
+            <Field label="Contact email" name="contact_email" value={form.contact_email} onChange={set} onFocus={onFocus} onBlur={onBlur} type="email" placeholder="you@example.com" />
           </div>
 
           {/* Permission */}
