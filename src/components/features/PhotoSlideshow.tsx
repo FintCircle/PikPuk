@@ -148,7 +148,9 @@ export function PhotoSlideshow() {
     return getLocalViewed();
   }, [user, dbViewedIds]);
 
-  const shuffled = useMemo(() => weightedShuffle(dbPhotos, viewedIds), [dbPhotos, viewedIds]);
+  // Keep the photo order stable while viewing. Updating view history must never
+  // reshuffle the gallery or change the image without an explicit user action.
+  const shuffled = useMemo(() => weightedShuffle(dbPhotos, viewedIds), [dbPhotos]);
 
   const [index, setIndex] = useState(0);
   const [storyOpen, setStoryOpen] = useState(false);
