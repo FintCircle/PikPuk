@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
-import { Info, Camera, UserCircle } from "lucide-react";
+import { ChevronLeft, ChevronRight, Info, Camera, UserCircle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { DbPhoto } from "@/types/db";
 import { Photo } from "@/types/photo";
@@ -406,6 +406,30 @@ export function PhotoSlideshow() {
             </button>
           </div>
         </div>
+
+        {/* Manual navigation — stays outside the transformed image layer. */}
+        {shuffled.length > 1 && (
+          <>
+            <button
+              type="button"
+              onClick={goPrev}
+              aria-label="Previous photograph"
+              className="absolute left-3 top-1/2 z-10 flex size-10 -translate-y-1/2 items-center justify-center rounded-full opacity-55 transition-opacity hover:opacity-100 focus-visible:opacity-100"
+              style={{ background: "rgba(20, 12, 4, 0.42)", backdropFilter: "blur(6px)", color: "#d4b896" }}
+            >
+              <ChevronLeft data-icon="inline-start" />
+            </button>
+            <button
+              type="button"
+              onClick={goNext}
+              aria-label="Next photograph"
+              className="absolute right-3 top-1/2 z-10 flex size-10 -translate-y-1/2 items-center justify-center rounded-full opacity-55 transition-opacity hover:opacity-100 focus-visible:opacity-100"
+              style={{ background: "rgba(20, 12, 4, 0.42)", backdropFilter: "blur(6px)", color: "#d4b896" }}
+            >
+              <ChevronRight data-icon="inline-end" />
+            </button>
+          </>
+        )}
 
         {/* Bottom caption */}
         <div className="absolute bottom-0 left-0 right-0 z-10 px-6 pb-8 pointer-events-none">
