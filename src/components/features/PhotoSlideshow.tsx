@@ -154,8 +154,6 @@ export function PhotoSlideshow() {
 
   const [index, setIndex] = useState(0);
   const [storyOpen, setStoryOpen] = useState(false);
-  const [direction, setDirection] = useState<"left" | "right" | null>(null);
-  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
